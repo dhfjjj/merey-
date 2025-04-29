@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лови Момент Радости!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Comfortaa:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-start: #fef0f5; /* Светло-розовый */
+            --bg-end: #e6f7ff; /* Светло-голубой */
+            --text-main: #4a4e69; /* Приглушенный сине-фиолетовый */
+            --accent-color-1: #ff8fab; /* Яркий розовый */
+            --accent-color-2: #fec89a; /* Персиковый */
+            --accent-color-3: #80ed99; /* Яркий зеленый */
+            --accent-hover: #f7a3bb; /* Темнее розовый */
+            --text-color: #22223b; /* Темно-синий */
+            --shadow-light: rgba(255, 143, 171, 0.2);
+            --shadow-medium: rgba(255, 143, 171, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: linear-gradient(145deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            /* --- ИЗМЕНЕНО --- */
+            overflow-x: hidden; /* Разрешить вертикальную прокрутку, запретить горизонтальную */
+            /* --- КОНЕЦ ИЗМЕНЕНИЯ --- */
+            position: relative;
+            padding: 40px 20px;
+        }
+
+        /* Анимация фона - Конфетти */
+        .confetti-container {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--accent-color-1);
+            opacity: 0.7;
+            animation: fall 15s infinite linear;
+            top: -20px; /* Начинают над экраном */
+        }
+        .confetti.c2 { background-color: var(--accent-color-2); animation-duration: 18s; }
+        .confetti.c3 { background-color: var(--accent-color-3); animation-duration: 12s; }
+        .confetti.small { width: 6px; height: 6px; }
+        .confetti.medium { width: 8px; height: 8px; }
+
+        @keyframes fall {
+            0% { transform: translateY(0vh) rotate(0deg); opacity: 0.7; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        }
+
+
+        .content-wrapper {
+            background-color: rgba(255, 255, 255, 0.95); /* Почти непрозрачный */
+            padding: 50px 60px;
+            border-radius: 25px;
+            box-shadow: 0 15px 40px var(--shadow-light);
+            max-width: 700px;
+            width: 90%;
+            position: relative;
+            z-index: 1;
+            margin-top: 20px; /* Добавим отступ сверху на всякий случай */
+            margin-bottom: 60px; /* Увеличим отступ снизу для кнопки */
+            opacity: 0;
+            transform: scale(0.9);
+            animation: popUpWrapper 1s 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+         @keyframes popUpWrapper {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .page-title {
+            font-family: 'Pacifico', cursive; /* Веселый шрифт */
+            font-size: 2.8rem;
+            color: var(--accent-color-1);
+            margin-bottom: 40px;
+            text-align: center;
+            text-shadow: 1px 1px 2px var(--shadow-light);
+        }
+
+        #text-container {
+            font-family: 'Comfortaa', cursive; /* Читаемый, но округлый */
+            font-weight: 700; /* Жирнее */
+            font-size: 1.7rem; /* Крупнее */
+            color: var(--text-color);
+            line-height: 1.8;
+            text-align: center;
+            min-height: 200px;
+            white-space: pre-wrap;
+            position: relative; /* Для позиционирования частиц */
+        }
+
+        #text-container span {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(20px) scale(0.7); /* Начинают ниже и меньше */
+            transition: opacity 0.6s ease-out, transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Эффект "выпрыгивания" */
+            margin: 0 3px; /* Небольшой отступ между словами/фразами */
+            cursor: default; /* Стандартный курсор */
+        }
+
+        #text-container span.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* Стиль для иконок-разделителей */
+        .separator-icon {
+            font-size: 1.5rem; /* Крупнее иконки */
+            display: block; /* На новой строке */
+            margin: 15px 0;
+            animation: spinIcon 2s infinite linear; /* Вращение иконок */
+        }
+        .separator-icon.i1 { color: var(--accent-color-1); animation-delay: 0s;}
+        .separator-icon.i2 { color: var(--accent-color-2); animation-delay: -0.5s;}
+        .separator-icon.i3 { color: var(--accent-color-3); animation-delay: -1s;}
+
+        @keyframes spinIcon {
+            from { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.1); }
+            to { transform: rotate(360deg) scale(1); }
+        }
+
+        /* Частицы при появлении строки */
+        .line-particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 1;
+            animation: burst 0.6s ease-out forwards;
+        }
+        @keyframes burst {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--burst-x), var(--burst-y)) scale(0); opacity: 0; }
+        }
+
+
+        .next-button {
+            font-family: 'Comfortaa', cursive;
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 16px 38px;
+            color: white;
+            background: linear-gradient(45deg, var(--accent-color-1), var(--accent-color-2)); /* Градиент */
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            display: none; /* Hidden initially */
+            margin: 40px auto 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 18px var(--shadow-medium);
+            opacity: 0;
+        }
+
+        .next-button.visible {
+             display: inline-block;
+             animation: fadeInButton 1s ease-out forwards;
+        }
+
+        @keyframes fadeInButton {
+            to { opacity: 1; }
+        }
+
+
+        .next-button:hover {
+            background: linear-gradient(45deg, var(--accent-color-2), var(--accent-color-1));
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 10px 25px var(--shadow-medium);
+        }
+
+         .next-button:active {
+             transform: translateY(-2px) scale(1.02);
+             box-shadow: 0 6px 18px var(--shadow-medium);
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .page-title { font-size: 2.4rem; }
+            #text-container { font-size: 1.5rem; line-height: 1.7; }
+            .content-wrapper { padding: 40px 30px; }
+            .next-button { padding: 14px 32px; font-size: 1rem; }
+        }
+         @media (max-width: 480px) {
+            body { padding: 20px 15px; } /* Уменьшить паддинг body */
+            .page-title { font-size: 2rem; }
+            #text-container { font-size: 1.3rem; line-height: 1.6; }
+            .content-wrapper { padding: 30px 20px; margin-top: 10px; margin-bottom: 40px;}
+            .next-button { padding: 12px 28px; font-size: 0.9rem; }
+            .confetti { width: 6px; height: 6px; } /* Уменьшить конфетти */
+        }
+
+    </style>
+</head>
+<body>
+    <div class="confetti-container" id="confetti-container">
+        <!-- Конфетти будут добавлены через JS -->
+    </div>
+
+    <div class="content-wrapper">
+        <h2 class="page-title">Лови Момент Радости!</h2>
+        <div id="text-container">
+            <!-- Текст будет добавлен через JS -->
+        </div>
+    </div>
+
+    <a href="gallery.html" class="next-button" id="next-page-button">Ух ты! Дальше? &rarr;</a>
+
+    <script>
+        const textContainer = document.getElementById('text-container');
+        const nextButton = document.getElementById('next-page-button');
+        const confettiContainer = document.getElementById('confetti-container');
+
+        const joyfulLines = [
+            { text: "Эй, привет!", icon: null },
+            { text: "✨", icon: true, color: 'i1' },
+            /* --- ИЗМЕНЕНО --- */
+            { text: "Просто хотел добавить", icon: false },
+            /* --- КОНЕЦ ИЗМЕНЕНИЯ --- */
+            { text: "Немного красок в твой день!", icon: false },
+            { text: "🎨", icon: true, color: 'i2' },
+            { text: "Пусть он будет ярким,", icon: false },
+            { text: "Веселым и полным улыбок!", icon: false },
+            { text: "Не забывай радоваться мелочам!", icon: false },
+            { text: "☀️", icon: true, color: 'i3' },
+            { text: "Ты классная!", icon: false },
+            { text: "😊", icon: false }
+        ];
+
+        const wordDelay = 150;
+        const lineBreakDelay = 400;
+        const initialDelay = 500;
+
+        function createLineParticles(element) {
+            const rect = element.getBoundingClientRect();
+            const originX = rect.left + rect.width / 2;
+            const originY = rect.top + rect.height / 2;
+            const colors = ['var(--accent-color-1)', 'var(--accent-color-2)', 'var(--accent-color-3)'];
+
+            for (let i = 0; i < 8; i++) {
+                const p = document.createElement('div');
+                p.classList.add('line-particle');
+                p.style.position = 'fixed';
+                p.style.left = `${originX}px`;
+                p.style.top = `${originY}px`;
+                p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
+                const angle = Math.random() * Math.PI * 2;
+                const radius = Math.random() * 30 + 10;
+                const burstX = Math.cos(angle) * radius;
+                const burstY = Math.sin(angle) * radius;
+
+                p.style.setProperty('--burst-x', `${burstX}px`);
+                p.style.setProperty('--burst-y', `${burstY}px`);
+
+                document.body.appendChild(p);
+
+                p.addEventListener('animationend', () => p.remove());
+            }
+        }
+
+
+        let currentDelay = initialDelay;
+
+        joyfulLines.forEach((lineData, lineIndex) => {
+            const lineWrapper = document.createElement('div');
+            lineWrapper.style.display = 'block';
+
+            if (lineData.icon) {
+                const iconSpan = document.createElement('span');
+                iconSpan.classList.add('separator-icon', lineData.color);
+                iconSpan.textContent = lineData.text;
+                iconSpan.style.transitionDelay = `${currentDelay}ms`;
+
+                setTimeout(() => {
+                    iconSpan.classList.add('visible');
+                    createLineParticles(iconSpan);
+                }, currentDelay);
+
+                lineWrapper.appendChild(iconSpan);
+                currentDelay += wordDelay + lineBreakDelay;
+
+            } else {
+                const words = lineData.text.split(' ');
+                words.forEach((word, wordIndex) => {
+                    const wordSpan = document.createElement('span');
+                    wordSpan.textContent = word;
+                    wordSpan.style.transitionDelay = `${currentDelay}ms`;
+
+                    setTimeout(() => {
+                        wordSpan.classList.add('visible');
+                        if (wordIndex === 0) {
+                             createLineParticles(wordSpan);
+                        }
+                    }, currentDelay);
+
+                    lineWrapper.appendChild(wordSpan);
+                    currentDelay += wordDelay;
+                });
+                 currentDelay += lineBreakDelay;
+            }
+             textContainer.appendChild(lineWrapper);
+        });
+
+
+        setTimeout(() => {
+            nextButton.classList.add('visible');
+        }, currentDelay);
+
+
+        function createConfetti() {
+            const numConfetti = 50;
+            const types = ['c1', 'c2', 'c3'];
+            const sizes = ['small', 'medium', ''];
+
+            for (let i = 0; i < numConfetti; i++) {
+                const confetti = document.createElement('div');
+                const type = types[Math.floor(Math.random() * types.length)];
+                const size = sizes[Math.floor(Math.random() * sizes.length)];
+                confetti.classList.add('confetti', type, size);
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.animationDelay = Math.random() * 10 + 's';
+                confettiContainer.appendChild(confetti);
+            }
+        }
+        createConfetti();
+
+    </script>
+</body>
+</html>

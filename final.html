@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Просто Улыбнись! 😊</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Comfortaa:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Светлая, радостная палитра */
+            --bg-start: #e0f7fa; /* Светло-голубой */
+            --bg-end: #fffde7; /* Бледно-желтый */
+            --text-main: #37474f; /* Темно-серо-синий */
+            --accent-color: #ffca28; /* Яркий желтый/золотой */
+            --accent-hover: #ffb300; /* Темнее желтый */
+            --particle-color-1: #ff8fab; /* Розовый */
+            --particle-color-2: #fec89a; /* Персиковый */
+            --particle-color-3: #80ed99; /* Зеленый */
+            --shadow-light: rgba(255, 202, 40, 0.2);
+            --shadow-medium: rgba(255, 202, 40, 0.3);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: linear-gradient(145deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+            padding: 40px 20px;
+        }
+
+        /* Холст для сияющих частиц */
+        #sparkle-canvas {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; pointer-events: none;
+        }
+
+        .content-wrapper {
+            background-color: rgba(255, 255, 255, 0.92); /* Светлый фон */
+            padding: 50px 60px;
+            border-radius: 25px;
+            box-shadow: 0 10px 35px var(--shadow-light);
+            border: 1px solid rgba(255, 202, 40, 0.3); /* Легкая рамка */
+            text-align: center;
+            max-width: 650px;
+            width: 90%;
+            position: relative;
+            z-index: 1;
+            opacity: 0;
+            transform: scale(0.9);
+            animation: finalPopIn 1.5s 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes finalPopIn {
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .final-title {
+            font-family: 'Pacifico', cursive;
+            font-size: 3rem;
+            color: var(--accent-color);
+            margin-bottom: 25px;
+            text-shadow: 1px 1px 3px var(--shadow-light);
+        }
+
+        .final-message {
+            font-family: 'Comfortaa', cursive;
+            font-size: 1.6rem;
+            line-height: 1.8;
+            margin-bottom: 35px;
+            color: var(--text-main);
+        }
+
+        .final-icon {
+            font-size: 3.5rem; /* Крупный смайлик */
+            display: inline-block;
+            margin-top: 10px;
+            animation: iconBounce 2s infinite ease-in-out;
+        }
+
+        @keyframes iconBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-10px) scale(1.1); }
+        }
+
+        .restart-button {
+            font-family: 'Comfortaa', cursive;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 10px 22px;
+            color: var(--text-main);
+            background-color: transparent;
+            border: 2px solid var(--accent-color);
+            border-radius: 25px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 40px;
+            transition: all 0.3s ease;
+            opacity: 0;
+            animation: fadeInButton 1s 2s ease-out forwards;
+        }
+
+        @keyframes fadeInButton { to { opacity: 1; } }
+
+        .restart-button:hover {
+            background-color: var(--accent-color);
+            color: white;
+            box-shadow: 0 5px 15px var(--shadow-medium);
+            transform: translateY(-2px);
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .final-title { font-size: 2.5rem; }
+            .final-message { font-size: 1.4rem; }
+            .content-wrapper { padding: 40px 30px; }
+            .final-icon { font-size: 3rem; }
+        }
+         @media (max-width: 480px) {
+            .final-title { font-size: 2.2rem; }
+            .final-message { font-size: 1.2rem; }
+            .content-wrapper { padding: 30px 20px; }
+            .final-icon { font-size: 2.5rem; }
+            .restart-button { font-size: 0.8rem; padding: 8px 18px; margin-top: 30px;}
+        }
+
+    </style>
+</head>
+<body>
+
+    <canvas id="sparkle-canvas"></canvas>
+
+    <div class="content-wrapper">
+        <h1 class="final-title">Просто Улыбнись!</h1>
+        <p class="final-message">
+            Надеюсь, этот маленький сюрприз поднял тебе настроение! <br> Пусть твой день будет таким же светлым и радостным.
+        </p>
+        <span class="final-icon">🥳</span> <!-- Веселый смайлик -->
+
+        <a href="index.html" class="restart-button">Еще раз?</a>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('sparkle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        const numParticles = 100; // Количество частиц
+        const particleColors = [
+            'var(--particle-color-1)',
+            'var(--particle-color-2)',
+            'var(--particle-color-3)',
+            'var(--accent-color)' // Желтый
+        ];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            particles = []; // Сбросить частицы
+            createParticles();
+        }
+
+        // Структура частицы
+        function Particle(x, y, radius, color, speed) {
+            this.x = x;
+            this.y = y;
+            this.radius = radius;
+            this.color = color;
+            this.speed = speed;
+            this.initialY = y; // Запоминаем начальную Y для сброса
+            this.opacity = Math.random() * 0.5 + 0.5; // Случайная начальная прозрачность
+        }
+
+        Particle.prototype.draw = function() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+            ctx.fillStyle = this.color;
+            ctx.globalAlpha = this.opacity; // Применяем прозрачность
+            ctx.fill();
+            ctx.globalAlpha = 1.0; // Сбрасываем общую прозрачность
+        };
+
+        Particle.prototype.update = function() {
+            this.y -= this.speed; // Движение вверх
+            this.opacity -= 0.005; // Постепенное исчезновение
+
+            // Если частица ушла вверх или стала невидимой, сбрасываем ее вниз
+            if (this.y < -this.radius || this.opacity <= 0) {
+                this.y = canvas.height + this.radius; // Появляется снизу
+                this.x = Math.random() * canvas.width; // В случайном месте по X
+                this.opacity = Math.random() * 0.5 + 0.5; // Новая прозрачность
+                this.speed = Math.random() * 1 + 0.5; // Новая скорость
+            }
+            this.draw();
+        };
+
+        function createParticles() {
+            for (let i = 0; i < numParticles; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height; // Начинают в случайных местах
+                const radius = Math.random() * 2 + 1; // Радиус от 1 до 3
+                const color = particleColors[Math.floor(Math.random() * particleColors.length)];
+                const speed = Math.random() * 1 + 0.5; // Скорость от 0.5 до 1.5
+                particles.push(new Particle(x, y, radius, color, speed));
+            }
+        }
+
+        function animateParticles() {
+            requestAnimationFrame(animateParticles);
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Очистить холст
+
+            particles.forEach(particle => {
+                particle.update();
+            });
+        }
+
+        // Инициализация
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas(); // Первоначальный вызов
+        animateParticles();
+
+    </script>
+
+</body>
+</html>
